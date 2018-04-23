@@ -1,0 +1,15 @@
+{
+    "terminal.integrated.env.linux": {
+        "PATH": "/home/diggerdata/.platformio/penv/bin:/home/diggerdata/.platformio/penv:/home/diggerdata/bin:/home/diggerdata/.local/bin:/usr/local/cuda-9.0/bin:/opt/ros/kinetic/bin:/home/diggerdata/.rvm/gems/ruby-2.4.1/bin:/home/diggerdata/.rvm/gems/ruby-2.4.1@global/bin:/usr/share/rvm/rubies/ruby-2.4.1/bin:/home/diggerdata/bin:/home/diggerdata/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/lib/jvm/java-8-oracle/bin:/usr/lib/jvm/java-8-oracle/db/bin:/usr/lib/jvm/java-8-oracle/jre/bin:/usr/lib/jvm/java-8-oracle/bin:/usr/lib/jvm/java-8-oracle/db/bin:/usr/lib/jvm/java-8-oracle/jre/bin:/usr/share/rvm/bin$",
+        "PLATFORMIO_CALLER": "vscode"
+    },
+    "files.associations": {
+        "cstdlib": "cpp",
+        "initializer_list": "cpp"
+    },
+    "python.autoComplete.extraPaths": [
+        "/home/diggerdata/catkin_wpirm/devel/lib/python2.7/dist-packages",
+        "/home/diggerdata/catkin_ws/devel/lib/python2.7/dist-packages",
+        "/opt/ros/kinetic/lib/python2.7/dist-packages"
+    ]
+}
