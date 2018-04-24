@@ -10,7 +10,7 @@
 #include <Encoder.h>
 #include "PID.h"
 
-#define HWSERIAL Serial2
+#define HWSERIAL Serial1
 
 // PID setup (kp, ki, kd)
 
@@ -31,18 +31,17 @@ char odom[] = "/odom";
 
 // Encoder setup
 
-#define ENCODER_R_A 23
-#define ENCODER_R_B 22
-#define ENCODER_L_A 21
-#define ENCODER_L_B 20
+#define ENCODER_R_A 30
+#define ENCODER_R_B 29
+#define ENCODER_L_A 25
+#define ENCODER_L_B 24
 #define TICKS_PER_REV 6000.0
 
 Encoder leftEncoder(ENCODER_L_A, ENCODER_L_B);
 Encoder rightEncoder(ENCODER_R_A, ENCODER_R_B);
 
 long lastTime = 0;
-double total_xy = 0.0;
-double total_th = 0.0;
+double th = 0.0;
 double last_xy = 0.0;
 double last_th = 0.0;
 
@@ -61,17 +60,7 @@ double ticks_to_meters(long ticks) {
 
 // TODO: Finish this returns: evl and evr
 void calculate_vels() {
-    long curTime = millis();
-    double dt = (double)curTime/1000 - (double)lastTime/1000;
-    double dth = last_th - theta;
-    double dxy = total_xy - last_xy;
-
-    evx = dxy/dt;
-    evth = dth/dt;
-
-    lastTime = curTime;
-    last_xy = total_xy;
-    last_th = theta;
+    
 }
 
 // TODO: (IMPORTANT!) Redo to use delta everthing
@@ -79,21 +68,29 @@ void calculate_odom() {
     long L_ticks, R_ticks;
     double left_meters, right_meters;
 
+    long curTime = millis();
+
     R_ticks = leftEncoder.read();
+    leftEncoder.write(0);
     L_ticks = -rightEncoder.read();
+    rightEncoder.write(0);
 
     left_meters = ticks_to_meters(L_ticks);
     right_meters = ticks_to_meters(R_ticks);
 
-    total_xy = (double)(left_meters + right_meters) / 2.0;
+    
+    double dt = (double)curTime/1000 - (double)lastTime/1000;
 
-    theta = (right_meters - left_meters) / (double)WHEEL_BASE;
-    theta -= (double)((int)(theta/(PI * 2.0)))*(PI * 2.0);
+    double dxy = (double)(left_meters + right_meters) / 2.0;
+    double dth = (double)(right_meters - left_meters) / (double)WHEEL_BASE;
 
-    x = total_xy * cos(theta); 
-    y = total_xy * sin(theta); 
+    th += dth;
+    x += dxy * cos(th);
+    y += dxy * sin(th);
+    evth = dth/dt;
+    evx = dxy/dt;
 
-    calculate_vels();
+    lastTime = curTime;
 }
 
 void set_motor(double motor, double speed) {
@@ -132,6 +129,7 @@ void set_motors() {
 ros::NodeHandle  nh;
 
 void cmd_vel_cb(const geometry_msgs::Twist& msg) {
+    // nh.loginfo("Got a cmd_vel");
     mvr = (msg.angular.z * WHEEL_BASE) / 2.0 + msg.linear.x;
 	mvl = msg.linear.x * 2.0 - mvr;
 }
@@ -151,11 +149,11 @@ void transform_broadcaster() {
 
     // tf odom->base_link
     t.header.frame_id = "base_link";
-    o.header.frame_id = "odom";
+    o.header.frame_id = "base_link";
     t.child_frame_id = "odom";
-    o.child_frame_id = "base_link";
+    o.child_frame_id = "odom";
 
-    geometry_msgs::Quaternion odom_quat = tf::createQuaternionFromYaw(theta);
+    geometry_msgs::Quaternion odom_quat = tf::createQuaternionFromYaw(th);
     
     t.transform.translation.x = x;
     t.transform.translation.y = y;
@@ -165,13 +163,13 @@ void transform_broadcaster() {
     o.pose.pose.position.z = 0.0;
     o.pose.pose.orientation = odom_quat;
 
-    o.twist.twist.linear.x = evx;
+    o.twist.twist.linear.x = 0.0;
     o.twist.twist.linear.y = 0.0;
     o.twist.twist.linear.z = 0.0;
     
     o.twist.twist.angular.x = 0.0;
     o.twist.twist.angular.y = 0.0;
-    o.twist.twist.angular.z = evth;
+    o.twist.twist.angular.z = 0.0;
     
     t.transform.rotation = odom_quat;
     t.header.stamp = nh.now();
