@@ -10,19 +10,25 @@
 #include <Encoder.h>
 #include "PID.h"
 
+//Hardware Pin Definitions
 #define HWSERIAL Serial1
 
+#define ENCODER_R_A 30
+#define ENCODER_R_B 29
+#define ENCODER_L_A 25
+#define ENCODER_L_B 24
+
+#define BUMPER 33
+
+//PID Setup
 int kP = 0.15;
 int kI = 0.0;
 int kD = 0.0;
-
-// PID setup (kp, ki, kd)
 
 PID rPid = PID(kP, kI, kD);
 PID lPid = PID(kP, kI, kD);
 
 // Odometry setup (meters)
-
 #define WHEEL_BASE 0.13
 #define WHEEL_RADIUS 0.06
 
@@ -35,11 +41,7 @@ char odom[] = "/odom";
 
 // Encoder setup
 
-#define ENCODER_R_A 30
-#define ENCODER_R_B 29
-#define ENCODER_L_A 25
-#define ENCODER_L_B 24
-#define TICKS_PER_REV 6000.0
+#define TICKS_PER_REV 3600.0
 
 Encoder leftEncoder(ENCODER_L_A, ENCODER_L_B);
 Encoder rightEncoder(ENCODER_R_A, ENCODER_R_B);
@@ -146,6 +148,7 @@ tf::TransformBroadcaster broadcaster;
 
 ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", cmd_vel_cb);
 ros::Publisher odomPub("odom", &o);
+ros::Publisher bumperPub("bumper", )
 
 // Tf broadcaster
 void transform_broadcaster() {
