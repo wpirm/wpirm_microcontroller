@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <ros.h>
 #include <geometry_msgs/Twist.h>
+#include <std_msgs/Boolean.h>
 #include <tf/tf.h>
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
@@ -144,11 +145,13 @@ void cmd_vel_cb(const geometry_msgs::Twist& msg) {
 geometry_msgs::TransformStamped t;
 nav_msgs::Odometry o;
 
+std_msgs::Boolean isBumped;
+
 tf::TransformBroadcaster broadcaster;
 
 ros::Subscriber<geometry_msgs::Twist> sub("cmd_vel", cmd_vel_cb);
 ros::Publisher odomPub("odom", &o);
-ros::Publisher bumperPub("bumper", )
+ros::Publisher bumperPub("bumper", &b);
 
 // Tf broadcaster
 void transform_broadcaster() {
@@ -186,13 +189,26 @@ void transform_broadcaster() {
     broadcaster.sendTransform(t);
 }
 
+void bumperCallback(){
+    if (digitalRead(BUMPER)){
+        isBumped.data = true;
+    } else {
+        isBumped.data = false;
+    }
+}
+
 void setup() {
     nh.initNode();
     nh.advertise(odomPub);
+    nh.advertise(bumperPub);
     nh.subscribe(sub);
     broadcaster.init(nh);
 
     HWSERIAL.begin(19200);
+
+    // Bumper Setup
+    pinMode(BUMPER, INPUT);
+    attachInterrupt(digitalPinToInterrupt(BUMPER), bumperCallback, CHANGE);
 
     // PID set params
     rPid.setOutputLimits(-100,100);
