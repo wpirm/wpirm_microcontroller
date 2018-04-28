@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <ros.h>
 #include <geometry_msgs/Twist.h>
-#include <std_msgs/Boolean.h>
+#include <std_msgs/Bool.h>
 #include <tf/tf.h>
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
@@ -144,8 +144,7 @@ void cmd_vel_cb(const geometry_msgs::Twist& msg) {
 // ROS subscribers and transform publishers
 geometry_msgs::TransformStamped t;
 nav_msgs::Odometry o;
-
-std_msgs::Boolean isBumped;
+std_msgs::Bool b;
 
 tf::TransformBroadcaster broadcaster;
 
@@ -191,9 +190,9 @@ void transform_broadcaster() {
 
 void bumperCallback(){
     if (digitalRead(BUMPER)){
-        isBumped.data = true;
+        b.data = true;
     } else {
-        isBumped.data = false;
+        b.data = false;
     }
 }
 
