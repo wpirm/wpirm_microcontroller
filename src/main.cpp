@@ -12,14 +12,18 @@
 
 #define HWSERIAL Serial1
 
+int kP = 0.15;
+int kI = 0.0;
+int kD = 0.0;
+
 // PID setup (kp, ki, kd)
 
-PID rPid = PID(0.1, 0.01, 0);
-PID lPid = PID(0.1, 0.01, 0);
+PID rPid = PID(kP, kI, kD);
+PID lPid = PID(kP, kI, kD);
 
 // Odometry setup (meters)
 
-#define WHEEL_BASE 0.18
+#define WHEEL_BASE 0.13
 #define WHEEL_RADIUS 0.06
 
 double x = 0.0;
